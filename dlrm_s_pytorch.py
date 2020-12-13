@@ -174,7 +174,13 @@ class DLRM_Net(nn.Module):
         return torch.nn.Sequential(*layers)
 
     def create_emb(self, m, ln):
+        # m matrix sparsity(m_spa): fixed value = 2
+        # ln length of the embeddings(ln_emb): array fixed value [4 3 2]
+
+        # emb_l ModuleList, list of modules, will contain the embeddings.
         emb_l = nn.ModuleList()
+        
+        # iterates over ln: [4 3 2]
         for i in range(0, ln.size):
             n = ln[i]
             # construct embedding operator
@@ -192,22 +198,40 @@ class DLRM_Net(nn.Module):
                 EE.embs.weight.data = torch.tensor(W, requires_grad=True)
 
             else:
+                # n: # of Embeddings -> 
+				#						i: 0 = n: 4
+				#						i: 1 = n: 3
+				#						i: 2 = n: 2
+				#
+				# m: Embedding dimesion -> Always 2
+				#
+				# mode: Way to reduce the bag
+				#	sum -> computes the weighted sum, taking per_sample_weights into consideration.
+				#
+				# sparse: weight matrix will be a sparse tensor
                 EE = nn.EmbeddingBag(n, m, mode="sum", sparse=True)
+				
+				# print the embeddings created
+                # print(EE)
 
                 # initialize embeddings
-                # nn.init.uniform_(EE.weight, a=-np.sqrt(1 / n), b=np.sqrt(1 / n))
+				# weight of shape (N, M)
                 W = np.random.uniform(
                     low=-np.sqrt(1 / n), high=np.sqrt(1 / n), size=(n, m)
                 ).astype(np.float32)
-                # approach 1
+				
+				# print the initialized weight
+                # print(W)
+				
+				# it will be treated as N bags (sequences) each of fixed length M, 
+				# and this will return N values aggregated in a way depending on the mode.
+				
+				# [[VISITAR PAGINA EMBEDDING BAG PYTORCH]]
+				# EJEMPLO PESOS DE LA PAGINA + EJEMPLO PESOS DEL PAPER
                 EE.weight.data = torch.tensor(W, requires_grad=True)
-                # approach 2
-                # EE.weight.data.copy_(torch.tensor(W))
-                # approach 3
-                # EE.weight = Parameter(torch.tensor(W),requires_grad=True)
 
             emb_l.append(EE)
-
+        print(emb_l[0].weight)
         return emb_l
 
     def __init__(
@@ -286,7 +310,6 @@ class DLRM_Net(nn.Module):
         for k in range(len(lS_i)):
             sparse_index_group_batch = lS_i[k]
             sparse_offset_group_batch = lS_o[k]
-
             # embedding lookup
             # We are using EmbeddingBag, which implicitly uses sum operator.
             # The embeddings are represented as tall matrices, with sum
