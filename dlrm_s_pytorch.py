@@ -203,7 +203,7 @@ class DLRM_Net(nn.Module):
                 #						i: 1 = n: 3
                 #						i: 2 = n: 2
                 #
-                # m: Embedding dimesion -> Always 2
+                # m: Embedding dimesion -> Always 2 dimensions
                 #
                 # mode: Way to reduce the bag
                 #	sum -> computes the weighted sum, taking per_sample_weights into consideration.
@@ -231,6 +231,11 @@ class DLRM_Net(nn.Module):
                 EE.weight.data = torch.tensor(W, requires_grad=True)
 
             emb_l.append(EE)
+
+        # print EBag initialization weights 
+        # print(emb_l[0].weight)
+        # print(emb_l[1].weight)
+        # print(emb_l[2].weight)
         return emb_l
 
     def __init__(
@@ -304,6 +309,16 @@ class DLRM_Net(nn.Module):
         # 2. for each embedding the lookups are further organized into a batch
         # 3. for a list of embedding tables there is a list of batched lookups
 
+        # Input data
+        #
+        # lS_o: Tensor(3, 1) -> 2 dimensions(number of params), 3 elements, each element with 1 dimension
+        # print(lS_o)
+        #
+        # lS_i: Array of 3 tensors
+        # print(lS_i)
+        #
+        # emb_l: Embedding List -> ListModule created in: create_emb()
+
         ly = []
         # for k, sparse_index_group_batch in enumerate(lS_i):
         for k in range(len(lS_i)):
@@ -315,7 +330,11 @@ class DLRM_Net(nn.Module):
             # The embeddings are represented as tall matrices, with sum
             # happening vertically across 0 axis, resulting in a row vector
             E = emb_l[k]
+            
+            # Order of the function
             V = E(sparse_index_group_batch, sparse_offset_group_batch)
+            # /home/nico/filename/python/lib/python3.8/site-packages/torch/nn/modules/sparse.py 	-> forward(): line 302
+            # /home/nico/filename/python/lib/python3.8/site-packages/torch/nn/functional.py 		-> embedding_bag(): line 1855
 
             ly.append(V)
 
