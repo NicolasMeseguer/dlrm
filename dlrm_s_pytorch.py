@@ -336,6 +336,7 @@ class DLRM_Net(nn.Module):
             # /home/nico/filename/python/lib/python3.8/site-packages/torch/nn/modules/sparse.py 	-> forward(): line 302
             # /home/nico/filename/python/lib/python3.8/site-packages/torch/nn/functional.py 		-> embedding_bag(): line 1855
 
+            print(V)
             ly.append(V)
 
         # print(ly)
