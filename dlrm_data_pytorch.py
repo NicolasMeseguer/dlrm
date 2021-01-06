@@ -748,15 +748,42 @@ def generate_uniform_input_batch(
     num_indices_per_lookup,
     num_indices_per_lookup_fixed,
 ):
+    # print("Preparing input data: \n")
+
+    # print("Number of lookups per embedding table: ", n)
+    # print("\n")
+	
+    # Parameters
+    #
+    #
+    # print(m_den) # size of bot mlp[0] = 4, used to create dense feature of the bottom MLP
+    # print(ln_emb) # array of [4 3 2], used to create the embeddings. Here it is used to create sparse features of the same size.
+	
+	# n = number of data points in a batch. WHERE TO FIND: __getitem__ param: n == 1
+	
+	# num_indices_per_lookup how many non-zero elements will be on a sparse feature [1,....,10]. Generated randomly. Default value = 10
+	# num_indices_per_lookup_fixed specific number of non-zero elements, by default = False.
+	
+
     # dense feature
     Xt = torch.tensor(ra.rand(n, m_den).astype(np.float32))
+    # print(" \n\nDense feature: ");print(Xt);print("\n\n")
 
     # sparse feature (sparse indices)
     lS_emb_offsets = []
     lS_emb_indices = []
     # for each embedding generate a list of n lookups,
     # where each lookup is composed of multiple sparse indices
+    
+	
+    nmi = 1 # variable personal para hacer un control de los valores del array.
+	
+	
     for size in ln_emb:
+        # print(size) 4, 3, 2
+		
+        print("Embedding num:", str(nmi))
+		
         lS_batch_offsets = []
         lS_batch_indices = []
         offset = 0
@@ -770,9 +797,11 @@ def generate_uniform_input_batch(
                 sparse_group_size = np.int64(
                     np.round(max([1.0], r * min(size, num_indices_per_lookup)))
                 )
+            # print("# of sparse indices to be used in the embedding: ", sparse_group_size)
             # sparse indices to be used per embedding
             r = ra.random(sparse_group_size)
             sparse_group = np.unique(np.round(r * (size - 1)).astype(np.int64))
+            # print("Sparse indices to be used in the embedding: ", sparse_group)
             # reset sparse_group_size in case some index duplicates were removed
             sparse_group_size = np.int64(sparse_group.size)
             # store lengths and indices
@@ -780,8 +809,12 @@ def generate_uniform_input_batch(
             lS_batch_indices += sparse_group.tolist()
             # update offset for next iteration
             offset += sparse_group_size
+        print("Offsets ", lS_batch_offsets)
+        print("Indices ", lS_batch_indices)
+        print("\n\n")
         lS_emb_offsets.append(torch.tensor(lS_batch_offsets))
         lS_emb_indices.append(torch.tensor(lS_batch_indices))
+        nmi+=1 # variable personal, para hacer un control de las variables.
 
     return (Xt, lS_emb_offsets, lS_emb_indices)
 

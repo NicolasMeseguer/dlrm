@@ -212,7 +212,7 @@ class DLRM_Net(nn.Module):
                 EE = nn.EmbeddingBag(n, m, mode="sum", sparse=True)
 				
 				# print the embeddings created
-                # print(EE)
+                print(EE)
 
                 # initialize embeddings
                 # weight of shape (N, M)
@@ -221,7 +221,8 @@ class DLRM_Net(nn.Module):
                 ).astype(np.float32)
 				
                 # print the initialized weight
-                # print(W)
+                print(W)
+                print("\n")
 				
                 # it will be treated as N bags (sequences) each of fixed length M, 
                 # and this will return N values aggregated in a way depending on the mode.
@@ -312,19 +313,23 @@ class DLRM_Net(nn.Module):
         # Input data
         #
         # lS_o: Tensor(3, 1) -> 2 dimensions(number of params), 3 elements, each element with 1 dimension
-        # print(lS_o)
+        print("\n")
+        print(lS_o)
         #
         # lS_i: Array of 3 tensors
-        # print(lS_i)
+        print(lS_i)
         #
         # emb_l: Embedding List -> ListModule created in: create_emb()
+        print("\n")
 
         ly = []
         # for k, sparse_index_group_batch in enumerate(lS_i):
         for k in range(len(lS_i)):
             sparse_index_group_batch = lS_i[k]
             sparse_offset_group_batch = lS_o[k]
-
+            # print(sparse_index_group_batch)
+            # print(sparse_offset_group_batch)
+			
             # embedding lookup
             # We are using EmbeddingBag, which implicitly uses sum operator.
             # The embeddings are represented as tall matrices, with sum
@@ -337,9 +342,9 @@ class DLRM_Net(nn.Module):
             # /home/nico/filename/python/lib/python3.8/site-packages/torch/nn/functional.py 		-> embedding_bag(): line 1855
 
             print(V)
+            print("\n")
             ly.append(V)
 
-        # print(ly)
         return ly
 
     def interact_features(self, x, ly):
