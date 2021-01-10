@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 import functionEmbeddings as fe
+import algEmbedding as aEmb
 
 ln = [4, 3, 2]	# embeddings length
 m = 2 			# matrix sparsity
@@ -58,17 +59,20 @@ n = fe.compute_batch_size(data_size, mini_batch_size, num_batches, index)
 print("\n3. Apply Embeddings\n")
 
 ly = []
-
+nico = []
 contadorEmbedding = 1
 for k in range(len(offsets)):
-	print("Embedding Table ", contadorEmbedding)
+	# print("Embedding Table ", contadorEmbedding)
 	sparse_index = indices[k]
 	sparse_offset = offsets[k]
 	
 	E = emb_l[k]
 	
 	V = E(sparse_index, sparse_offset)
+	N = aEmb.algEmbeddingMatrix(E, sparse_index, sparse_offset)
 	
-	print(V);print("\n")
 	ly.append(V)
+	nico.append(N)
 	contadorEmbedding+=1
+
+print(ly);print("\n");print(nico)

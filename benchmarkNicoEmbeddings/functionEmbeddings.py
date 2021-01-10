@@ -37,6 +37,7 @@ def generate_uniform_input_batch(
         indices_current_embedding = []
         offset = 0
 		
+		# number of sparse indices to be used per embedding
         r = ra.random(1)
         sparse_group_size = np.int64(np.round(max([1.0], r * min(size, num_indices_per_lookup))))
         print("# of sparse indices to be used in the embedding: ", sparse_group_size)
