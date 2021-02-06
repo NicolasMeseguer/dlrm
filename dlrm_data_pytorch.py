@@ -797,11 +797,11 @@ def generate_uniform_input_batch(
                 sparse_group_size = np.int64(
                     np.round(max([1.0], r * min(size, num_indices_per_lookup)))
                 )
-            # print("# of sparse indices to be used in the embedding: ", sparse_group_size)
+            print("# of sparse indices to be used in the embedding: ", sparse_group_size)
             # sparse indices to be used per embedding
             r = ra.random(sparse_group_size)
             sparse_group = np.unique(np.round(r * (size - 1)).astype(np.int64))
-            # print("Sparse indices to be used in the embedding: ", sparse_group)
+            print("Sparse indices to be used in the embedding: ", sparse_group)
             # reset sparse_group_size in case some index duplicates were removed
             sparse_group_size = np.int64(sparse_group.size)
             # store lengths and indices
